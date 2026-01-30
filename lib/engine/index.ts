@@ -1,9 +1,10 @@
 export { generateKit } from './generateKit';
 export type {
-  AIClient,
-  AIRequest,
   EngineKit,
+  GenerateJSONArgs,
+  LLMClient,
   Profile,
   ProjectData,
   PromptDefinition,
+  SchemaName,
 } from './types';

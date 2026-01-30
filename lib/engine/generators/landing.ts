@@ -1,15 +1,20 @@
-import type { AIClient, ProjectData, PromptDefinition, Profile } from '../types';
+import type { LLMClient, ProjectData, PromptDefinition, Profile, WithMeta } from '../types';
 import type { LandingKit } from '../schemas/landing.schema';
+import { buildSystemPrompt, buildUserPrompt } from '../promptBuilder';
 
 export const generateLanding = async (
   projectData: ProjectData,
   profile: Profile,
   prompt: PromptDefinition,
-  client: AIClient,
-): Promise<LandingKit> =>
-  client.generateJSON<LandingKit>({
-    contentType: 'landing',
-    prompt,
-    projectData,
-    profile,
+  client: LLMClient,
+): Promise<WithMeta<LandingKit>> =>
+  client.generateJSON<WithMeta<LandingKit>>({
+    system: buildSystemPrompt(prompt),
+    user: buildUserPrompt('landing', projectData, profile),
+    schemaName: 'landing',
+    context: {
+      contentType: 'landing',
+      projectData,
+      profile,
+    },
   });

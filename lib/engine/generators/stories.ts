@@ -1,15 +1,20 @@
-import type { AIClient, ProjectData, PromptDefinition, Profile } from '../types';
+import type { LLMClient, ProjectData, PromptDefinition, Profile, WithMeta } from '../types';
 import type { StoryKit } from '../schemas/story.schema';
+import { buildSystemPrompt, buildUserPrompt } from '../promptBuilder';
 
 export const generateStories = async (
   projectData: ProjectData,
   profile: Profile,
   prompt: PromptDefinition,
-  client: AIClient,
-): Promise<StoryKit> =>
-  client.generateJSON<StoryKit>({
-    contentType: 'stories',
-    prompt,
-    projectData,
-    profile,
+  client: LLMClient,
+): Promise<WithMeta<StoryKit>> =>
+  client.generateJSON<WithMeta<StoryKit>>({
+    system: buildSystemPrompt(prompt),
+    user: buildUserPrompt('stories', projectData, profile),
+    schemaName: 'stories',
+    context: {
+      contentType: 'stories',
+      projectData,
+      profile,
+    },
   });

@@ -13,6 +13,13 @@ Plataforma SaaS em pt-BR para geração automática de conteúdo e vendas com IA
 - `app/`: páginas Next.js (dashboard, onboarding, projetos, admin).
 - `lib/`: mocks e utilitários de domínio.
 
+## Configuração do Engine
+Copie o arquivo `.env.example` para `.env.local` e ajuste as variáveis conforme necessário.
+
+- `OPENAI_API_KEY`: chave da OpenAI. Sem ela, o engine usa o mock automaticamente.
+- `OPENAI_MODEL`: modelo padrão da OpenAI (ex.: `gpt-4.1-mini`).
+- `ENGINE_USE_MOCK`: defina `true` para forçar o mock mesmo com chave configurada.
+
 ## Próximos passos de implementação
 1. Integrar autenticação (NextAuth ou solução custom com magic link).
 2. Adicionar Stripe + webhooks para criação/atualização/cancelamento de assinaturas.
