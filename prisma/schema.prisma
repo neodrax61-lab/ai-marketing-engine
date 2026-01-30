@@ -20,12 +20,26 @@ enum GenerationStatus {
   error
 }
 
+enum SubscriptionPlan {
+  basic
+  pro
+  business
+}
+
+enum SubscriptionStatus {
+  active
+  inactive
+  canceled
+}
+
 model User {
-  id         String       @id @default(cuid())
-  email      String       @unique
-  createdAt  DateTime     @default(now())
-  projects   Project[]
-  generations Generation[]
+  id               String        @id @default(cuid())
+  email            String        @unique
+  stripeCustomerId String?       @unique
+  createdAt        DateTime      @default(now())
+  projects         Project[]
+  generations      Generation[]
+  subscription     Subscription?
 }
 
 model Project {
@@ -54,4 +68,17 @@ model Generation {
 
   project       Project          @relation(fields: [projectId], references: [id])
   user          User             @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String             @unique
+  plan                 SubscriptionPlan
+  status               SubscriptionStatus
+  currentPeriodEnd     DateTime
+  createdAt            DateTime           @default(now())
+
+  user                 User               @relation(fields: [userId], references: [id])
 }
