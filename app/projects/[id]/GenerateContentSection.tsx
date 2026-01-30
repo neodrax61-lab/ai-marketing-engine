@@ -1,34 +1,41 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { EngineKit, Profile, ProjectData } from '../../../lib/engine/types';
+import type { EngineKit, ProjectData } from '../../../lib/engine/types';
 import type { GenerateResponse } from '../../../lib/engine/api';
 
 const defaultErrorMessage = 'Não foi possível gerar o conteúdo agora. Tente novamente.';
 
 type GenerateContentSectionProps = {
+  projectId: string;
   projectData: ProjectData;
-  profile: Profile;
+  profileLabel: string;
+  initialKit?: EngineKit | null;
 };
 
 type GenerationStatus = 'idle' | 'loading' | 'success' | 'error';
 
-export function GenerateContentSection({ projectData, profile }: GenerateContentSectionProps) {
+export function GenerateContentSection({
+  projectId,
+  projectData,
+  profileLabel,
+  initialKit = null,
+}: GenerateContentSectionProps) {
   const [status, setStatus] = useState<GenerationStatus>('idle');
-  const [kit, setKit] = useState<EngineKit | null>(null);
+  const [kit, setKit] = useState<EngineKit | null>(initialKit);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
-  const hasResult = status === 'success' && kit;
+  const hasResult = kit;
 
   const handleGenerate = async () => {
     setStatus('loading');
     setErrorMessage('');
 
     try {
-      const response = await fetch('/api/generate', {
+      const response = await fetch(`/api/projects/${projectId}/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectData, profile }),
+        body: JSON.stringify({ projectData }),
       });
 
       const data = (await response.json()) as GenerateResponse;
@@ -56,6 +63,9 @@ export function GenerateContentSection({ projectData, profile }: GenerateContent
     <div className="card">
       <h3>Gerar conteúdo com IA</h3>
       <p>Dispare uma nova geração completa com base no briefing do projeto.</p>
+      <p>
+        Perfil selecionado: <strong>{profileLabel}</strong>
+      </p>
       <button type="button" onClick={handleGenerate} disabled={status === 'loading'}>
         {status === 'loading' ? 'Gerando conteúdo…' : 'Gerar conteúdo'}
       </button>
