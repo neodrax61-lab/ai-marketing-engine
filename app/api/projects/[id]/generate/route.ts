@@ -4,6 +4,10 @@ import { prisma } from '../../../../../lib/db/prisma';
 import { getDevUser } from '../../../../../lib/db/getDevUser';
 import { profileToEngine } from '../../../../../lib/db/profile';
 import type { EngineKit, ProjectData } from '../../../../../lib/engine/types';
+import {
+  requireActiveSubscription,
+  SubscriptionRequiredError,
+} from '../../../../../lib/billing/requireActiveSubscription';
 
 type Params = {
   params: { id: string };
@@ -12,6 +16,7 @@ type Params = {
 export async function POST(_request: Request, { params }: Params) {
   try {
     const user = await getDevUser();
+    await requireActiveSubscription(user.id);
 
     const project = await prisma.project.findFirst({
       where: { id: params.id, userId: user.id },
@@ -70,6 +75,12 @@ export async function POST(_request: Request, { params }: Params) {
 
     return NextResponse.json({ kit });
   } catch (error) {
+    if (error instanceof SubscriptionRequiredError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
+    }
     console.error('Erro ao gerar conteúdo do projeto:', error);
     return NextResponse.json(
       { error: 'Não foi possível gerar o conteúdo agora.' },
