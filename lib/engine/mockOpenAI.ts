@@ -1,4 +1,4 @@
-import type { AIClient, AIRequest, ProjectData, Profile } from './types';
+import type { GenerateJSONArgs, LLMClient, ProjectData, Profile, SchemaName, WithMeta } from './types';
 import type { PostKit } from './schemas/post.schema';
 import type { StoryKit } from './schemas/story.schema';
 import type { ReelKit } from './schemas/reel.schema';
@@ -227,9 +227,15 @@ const buildLanding = (projectData: ProjectData, profile: Profile): LandingKit =>
   ctaPrincipal: 'Quero receber o plano completo',
 });
 
-export const createMockOpenAIClient = (): AIClient => ({
-  async generateJSON<T>(request: AIRequest): Promise<T> {
-    const { contentType, projectData, profile } = request;
+export const createMockOpenAIClient = (): LLMClient => ({
+  async generateJSON<T>(args: GenerateJSONArgs): Promise<T> {
+    const context = args.context;
+
+    if (!context) {
+      throw new Error('Mock OpenAI client precisa do contexto para gerar conteúdo.');
+    }
+
+    const { contentType, projectData, profile } = context;
 
     const builders = {
       posts: () => buildPosts(projectData, profile),
@@ -240,8 +246,10 @@ export const createMockOpenAIClient = (): AIClient => ({
       whatsapp: () => buildWhatsapp(projectData, profile),
       ads: () => buildAds(projectData, profile),
       landing: () => buildLanding(projectData, profile),
-    } satisfies Record<AIRequest['contentType'], () => unknown>;
+    } satisfies Record<SchemaName, () => unknown>;
 
-    return builders[contentType]() as T;
+    const output = builders[contentType]() as WithMeta<T>;
+
+    return output;
   },
 });

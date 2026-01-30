@@ -1,15 +1,20 @@
-import type { AIClient, ProjectData, PromptDefinition, Profile } from '../types';
+import type { LLMClient, ProjectData, PromptDefinition, Profile, WithMeta } from '../types';
 import type { ReelKit } from '../schemas/reel.schema';
+import { buildSystemPrompt, buildUserPrompt } from '../promptBuilder';
 
 export const generateReels = async (
   projectData: ProjectData,
   profile: Profile,
   prompt: PromptDefinition,
-  client: AIClient,
-): Promise<ReelKit> =>
-  client.generateJSON<ReelKit>({
-    contentType: 'reels',
-    prompt,
-    projectData,
-    profile,
+  client: LLMClient,
+): Promise<WithMeta<ReelKit>> =>
+  client.generateJSON<WithMeta<ReelKit>>({
+    system: buildSystemPrompt(prompt),
+    user: buildUserPrompt('reels', projectData, profile),
+    schemaName: 'reels',
+    context: {
+      contentType: 'reels',
+      projectData,
+      profile,
+    },
   });

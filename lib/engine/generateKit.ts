@@ -4,7 +4,7 @@ import { affiliatePrompt } from './prompts/affiliate';
 import { localPrompt } from './prompts/local';
 import { beginnerPrompt } from './prompts/beginner';
 import { nichePrompt } from './prompts/niche';
-import { createMockOpenAIClient } from './mockOpenAI';
+import { createOpenAIClient } from './openai/createOpenAIClient';
 import { generatePosts } from './generators/posts';
 import { generateStories } from './generators/stories';
 import { generateReels } from './generators/reels';
@@ -34,7 +34,7 @@ export const generateKit = async (
   profile: Profile,
 ): Promise<EngineKit> => {
   const prompt = mergePrompts(basePrompt, profilePromptMap[profile]);
-  const client = createMockOpenAIClient();
+  const client = createOpenAIClient();
 
   const [posts, stories, reels, oferta, dm, whatsapp, ads, landing] =
     await Promise.all([

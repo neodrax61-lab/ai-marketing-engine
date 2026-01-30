@@ -1,5 +1,13 @@
 export type Profile = 'creator' | 'affiliate' | 'local' | 'beginner' | 'niche';
 
+export type EngineMeta = {
+  totalTokens: number | null;
+  totalCostEstimate: number | null;
+  model: string | null;
+};
+
+export type WithMeta<T> = T & { meta?: EngineMeta };
+
 export type ProjectData = {
   name: string;
   description: string;
@@ -26,31 +34,42 @@ export type PromptPayload = {
 };
 
 export type EngineKit = {
-  posts: import('./schemas/post.schema').PostKit;
-  stories: import('./schemas/story.schema').StoryKit;
-  reels: import('./schemas/reel.schema').ReelKit;
-  oferta: import('./schemas/offer.schema').OfferKit;
-  dm: import('./schemas/dm.schema').DmKit;
-  whatsapp: import('./schemas/dm.schema').WhatsappKit;
-  ads: import('./schemas/ad.schema').AdKit;
-  landing: import('./schemas/landing.schema').LandingKit;
+  posts: WithMeta<import('./schemas/post.schema').PostKit>;
+  stories: WithMeta<import('./schemas/story.schema').StoryKit>;
+  reels: WithMeta<import('./schemas/reel.schema').ReelKit>;
+  oferta: WithMeta<import('./schemas/offer.schema').OfferKit>;
+  dm: WithMeta<import('./schemas/dm.schema').DmKit>;
+  whatsapp: WithMeta<import('./schemas/dm.schema').WhatsappKit>;
+  ads: WithMeta<import('./schemas/ad.schema').AdKit>;
+  landing: WithMeta<import('./schemas/landing.schema').LandingKit>;
 };
 
-export type AIRequest = {
-  contentType:
-    | 'posts'
-    | 'stories'
-    | 'reels'
-    | 'oferta'
-    | 'dm'
-    | 'whatsapp'
-    | 'ads'
-    | 'landing';
-  prompt: PromptDefinition;
-  projectData: ProjectData;
-  profile: Profile;
+export type SchemaName =
+  | 'posts'
+  | 'stories'
+  | 'reels'
+  | 'oferta'
+  | 'dm'
+  | 'whatsapp'
+  | 'ads'
+  | 'landing';
+
+export type JSONSchema = Record<string, unknown>;
+
+export type GenerateJSONArgs = {
+  system: string;
+  user: string;
+  schemaName?: SchemaName;
+  schema?: JSONSchema;
+  temperature?: number;
+  maxTokens?: number;
+  context?: {
+    contentType: SchemaName;
+    projectData: ProjectData;
+    profile: Profile;
+  };
 };
 
-export type AIClient = {
-  generateJSON: <T>(request: AIRequest) => Promise<T>;
-};
+export interface LLMClient {
+  generateJSON: <T>(args: GenerateJSONArgs) => Promise<T>;
+}
