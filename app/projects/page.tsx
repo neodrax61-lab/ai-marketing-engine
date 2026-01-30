@@ -1,5 +1,4 @@
-import { ProjectCard } from '../components/ProjectCard';
-import { projects } from '../../lib/mock';
+import { ProjectsListClient } from './ProjectsListClient';
 
 export default function ProjectsPage() {
   return (
@@ -19,18 +18,7 @@ export default function ProjectsPage() {
           <button type="button">Criar projeto</button>
         </div>
       </div>
-      <div className="card-grid">
-        {projects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            name={project.name}
-            profile={project.profile}
-            status={project.status}
-            updatedAt={project.updatedAt}
-            actions={<a href={`/projects/${project.id}`}>Ver detalhes →</a>}
-          />
-        ))}
-      </div>
+      <ProjectsListClient />
     </section>
   );
 }
