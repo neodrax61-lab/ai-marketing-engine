@@ -1,5 +1,13 @@
 import { ContentKitList } from '../../components/ContentKitList';
+import { GenerateContentSection } from './GenerateContentSection';
 import { kitSummary, projects } from '../../../lib/mock';
+import type { Profile, ProjectData } from '../../../lib/engine/types';
+
+const profileMap: Record<string, Profile> = {
+  'Criador de Conteúdo': 'creator',
+  'Negócio Local': 'local',
+  Afiliado: 'affiliate',
+};
 
 type ProjectPageProps = {
   params: { id: string };
@@ -7,6 +15,29 @@ type ProjectPageProps = {
 
 export default function ProjectDetailPage({ params }: ProjectPageProps) {
   const project = projects.find((item) => item.id === params.id) ?? projects[0];
+  const profile = profileMap[project.profile] ?? 'creator';
+
+  const projectData: ProjectData = {
+    name: project.name,
+    description: 'Programa digital focado em gerar resultados rápidos e sustentáveis.',
+    audience: 'Mulheres de 25-40 anos que buscam praticidade e resultados confiáveis.',
+    offer: 'Acesso imediato ao curso completo + bônus de cardápios semanais e suporte.',
+    differentiators: [
+      'Receitas simples e rápidas de executar',
+      'Suporte semanal com feedback personalizado',
+      'Método testado com centenas de alunas',
+    ],
+    objections: [
+      'Não tenho tempo para cozinhar todos os dias',
+      'Tenho medo de não conseguir manter a rotina',
+      'Já tentei outras dietas sem sucesso',
+    ],
+    tone: 'Amigável, direto e motivador, com linguagem clara e acolhedora.',
+    channels: ['Instagram', 'Stories', 'Reels', 'WhatsApp', 'Anúncios Meta'],
+    niche: 'Alimentação saudável e praticidade',
+    constraints: ['Sem promessas exageradas', 'Evitar termos técnicos complexos'],
+    proofs: ['Mais de 2.000 alunas ativas', 'Depoimentos semanais de resultados reais'],
+  };
 
   return (
     <section className="two-col">
@@ -26,6 +57,7 @@ export default function ProjectDetailPage({ params }: ProjectPageProps) {
             <li>Canais: Instagram, WhatsApp e anúncios.</li>
           </ul>
         </div>
+        <GenerateContentSection projectData={projectData} profile={profile} />
         <div className="card">
           <h3>Editar ou regenerar</h3>
           <p>
